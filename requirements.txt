@@ -1,0 +1,7 @@
+# Jako klient chcę zagrać w Lotto, podać liczby i sprawdzić, czy wygrałem danego dnia.
+- klient podaje 6 liczb
+- liczby muszą być w zakresie 1-99
+- liczby nie mogą się powtarzać
+- klient dostaje informację o dacie losowania
+- klient dostaje informację o swoim unikalnym identyfikatorze losowania
+- losowania sa co sobotę o 12:00
