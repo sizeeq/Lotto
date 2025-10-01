@@ -1,16 +1,19 @@
 package pl.lotto.Lotto.domain.numberreceiver;
 
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-class NumberValidator {
+@Component
+public class NumberValidator {
 
     private static final int REQUIRED_NUMBERS_FROM_USER = 6;
     private static final int LOWER_BOUND = 1;
     private static final int UPPER_BOUND = 99;
 
-    List<ValidationError> validate(Set<Integer> numbersFromUser) {
+    public List<ValidationError> validate(Set<Integer> numbersFromUser) {
         List<ValidationError> validationErrors = new ArrayList<>();
 
         int size = numbersFromUser.size();

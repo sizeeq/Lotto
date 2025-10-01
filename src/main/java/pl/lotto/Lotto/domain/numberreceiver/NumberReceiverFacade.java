@@ -1,5 +1,6 @@
 package pl.lotto.Lotto.domain.numberreceiver;
 
+import org.springframework.stereotype.Component;
 import pl.lotto.Lotto.domain.numberreceiver.dto.NumberReceiverResultDto;
 import pl.lotto.Lotto.domain.numberreceiver.dto.TicketDto;
 
@@ -8,18 +9,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+@Component
 public class NumberReceiverFacade {
 
     private final NumberValidator numberValidator;
     private final NumberReceiverRepository repository;
     private final TicketIdGenerator idGenerator;
-    private final SaturdayDrawDateProvider drawDateProvider;
+    private final DrawDateProvider drawDateProvider;
 
-    public NumberReceiverFacade(NumberValidator numberValidator, NumberReceiverRepository repository, TicketIdGenerator idGenerator, SaturdayDrawDateProvider drawDateProvider1) {
+    public NumberReceiverFacade(NumberValidator numberValidator, NumberReceiverRepository repository, TicketIdGenerator idGenerator, DrawDateProvider drawDateProvider) {
         this.numberValidator = numberValidator;
         this.repository = repository;
         this.idGenerator = idGenerator;
-        this.drawDateProvider = drawDateProvider1;
+        this.drawDateProvider = drawDateProvider;
     }
 
     public NumberReceiverResultDto inputNumbers(Set<Integer> numbersFromUser) {
@@ -27,7 +29,6 @@ public class NumberReceiverFacade {
 
         if (validationResult.isEmpty()) {
             String id = idGenerator.generate();
-
             LocalDateTime drawDate = drawDateProvider.nextDrawDate();
 
             Ticket generatedTicket = Ticket.builder()
@@ -35,9 +36,7 @@ public class NumberReceiverFacade {
                     .numbers(numbersFromUser)
                     .drawDate(drawDate)
                     .build();
-
             Ticket savedTicket = repository.save(generatedTicket);
-
             TicketDto ticketDto = TicketMapper.toDto(savedTicket);
 
             return NumberReceiverResultDto.builder()
@@ -46,7 +45,6 @@ public class NumberReceiverFacade {
                     .errors(Collections.emptyList())
                     .build();
         }
-
         List<String> validationMessages = validationResult.stream()
                 .map(ValidationError::getMessage)
                 .toList();

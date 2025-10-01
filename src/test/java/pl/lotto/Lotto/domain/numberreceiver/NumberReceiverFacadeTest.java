@@ -1,6 +1,5 @@
 package pl.lotto.Lotto.domain.numberreceiver;
 
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import pl.lotto.Lotto.AdjustableClock;
@@ -18,7 +17,6 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static pl.lotto.Lotto.domain.numberreceiver.ValidationError.*;
 
-@Slf4j
 class NumberReceiverFacadeTest {
 
     private final NumberReceiverRepository repository = new InMemoryNumberReceiverRepositoryTestImpl();

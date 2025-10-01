@@ -1,15 +1,18 @@
 package pl.lotto.Lotto.domain.numberreceiver;
 
+import org.springframework.stereotype.Component;
+
 import java.time.Clock;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
 
+@Component
 public class SaturdayDrawDateProvider implements DrawDateProvider {
 
-    private final Clock clock;
     private static final LocalTime DRAW_TIME = LocalTime.of(12, 0, 0);
+    private final Clock clock;
 
     public SaturdayDrawDateProvider(Clock clock) {
         this.clock = clock;
