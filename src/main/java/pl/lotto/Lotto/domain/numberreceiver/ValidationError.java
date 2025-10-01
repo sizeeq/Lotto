@@ -3,7 +3,7 @@ package pl.lotto.Lotto.domain.numberreceiver;
 import lombok.Getter;
 
 @Getter
-enum ValidationError {
+public enum ValidationError {
 
     OUT_OF_RANGE("Number is out of range"),
     NOT_ENOUGH_NUMBERS("Not enough numbers provided"),
