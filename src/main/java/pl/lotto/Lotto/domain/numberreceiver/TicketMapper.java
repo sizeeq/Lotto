@@ -27,4 +27,10 @@ public class TicketMapper {
                 .drawDate(ticketDto.drawDate())
                 .build();
     }
+
+    public static List<Ticket> toEntity(List<TicketDto> ticketDtos) {
+        return ticketDtos.stream()
+                .map(TicketMapper::toEntity)
+                .toList();
+    }
 }
