@@ -1,6 +1,5 @@
 package pl.lotto.Lotto.domain.numberreceiver;
 
-import org.springframework.stereotype.Component;
 import pl.lotto.Lotto.domain.numberreceiver.dto.NumberReceiverResultDto;
 import pl.lotto.Lotto.domain.numberreceiver.dto.TicketDto;
 
@@ -9,7 +8,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-@Component
 public class NumberReceiverFacade {
 
     private final NumberValidator numberValidator;

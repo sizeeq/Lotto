@@ -21,19 +21,22 @@ public class ResultAnnouncerFacade {
                     ResultDto resultByTicketId = resultCheckerFacade.findResultByTicketId(ticketId);
                     String resultMessage = buildMessage(resultByTicketId);
 
-                    ResultAnnouncer announcer = ResultAnnouncer.builder()
-                            .ticketId(resultByTicketId.ticketId())
-                            .userNumbers(resultByTicketId.userNumbers())
-                            .winningNumbers(resultByTicketId.winningNumbers())
-                            .drawDate(resultByTicketId.drawDate())
-                            .status(resultByTicketId.status())
-                            .message(resultMessage)
-                            .build();
-
+                    ResultAnnouncer announcer = buildResultAnnouncer(resultByTicketId, resultMessage);
                     repository.save(announcer);
 
                     return ResultAnnouncerMapper.toDto(announcer);
                 });
+    }
+
+    private ResultAnnouncer buildResultAnnouncer(ResultDto resultByTicketId, String resultMessage) {
+        return ResultAnnouncer.builder()
+                .ticketId(resultByTicketId.ticketId())
+                .userNumbers(resultByTicketId.userNumbers())
+                .winningNumbers(resultByTicketId.winningNumbers())
+                .drawDate(resultByTicketId.drawDate())
+                .status(resultByTicketId.status())
+                .message(resultMessage)
+                .build();
     }
 
     private String buildMessage(ResultDto resultDto) {
