@@ -7,12 +7,40 @@ public class UserPlayedAndWonIntegrationTest extends BaseIntegrationTest {
 
     @Test
     public void f() {
-        //    step 1: external service returns 6 random numbers (1,2,3,4,5,6)
-        //    step 2: user made POST /inputNumbers with 6 numbers (1, 2, 3, 4, 5, 6) at 16-11-2022 10:00 and system returned OK(200) with message: “success” and Ticket (DrawDate:19.11.2022 12:00 (Saturday), TicketId: sampleTicketId)
-        //    step 3: system fetched winning numbers for draw date: 19.11.2022 12:00
-        //    step 4: 3 days and 1 minute passed, and it is 1 minute after the draw date (19.11.2022 12:01)
-        //    step 5: system generated result for TicketId: sampleTicketId with draw date 19.11.2022 12:00, and saved it with 6 hits
-        //    step 6: 3 hours passed, and it is 1 minute after announcement time (19.11.2022 15:01)
-        //    step 7: user made GET /results/sampleTicketId and system returned 200 (OK)
+        // step 1: External service (ExternalWinningNumbersGenerator) returned winning numbers: (1, 2, 3, 4, 5, 6)
+        //          for the upcoming draw date: 11.10.2025 12:00 (Saturday).
+
+        // step 2: User sent POST /inputNumbers with numbers (1, 2, 3, 4, 5, 6) at time 08.10.2025 10:00.
+        //          System responded with HTTP 200 OK and returned:
+        //          {
+        //            "message": "SUCCESS",
+        //            "ticketId": "sampleTicketId",
+        //            "drawDate": "2025-10-11T12:00:00"
+        //          }
+
+        // step 3: On 11.10.2025 12:00 system fetched the winning numbers
+        //          for draw date 11.10.2025 12:00 from ExternalWinningNumbersGenerator
+        //          through NumberGeneratorFacade and saved them to WinningNumbersRepository.
+
+        // step 4: Time advanced to 11.10.2025 12:01 (1 minute after draw time).
+        //          System triggered ResultCheckerFacade to calculate results for all tickets with draw date 11.10.2025 12:00.
+
+        // step 5: ResultCheckerFacade produced a result for ticketId = "sampleTicketId"
+        //          with matchedNumbers = 6, status = WIN, and persisted it to ResultCheckerRepository.
+
+        // step 6: Time advanced to 11.10.2025 15:01 (1 minute after official announcement time).
+        //          ResultAnnouncerFacade was triggered and prepared/cached announcement messages
+        //          for all available results in ResultAnnouncerRepository.
+
+        // step 7: User sent GET /results/sampleTicketId.
+        //          System returned HTTP 200 OK with payload:
+        //          {
+        //            "ticketId": "sampleTicketId",
+        //            "drawDate": "2025-10-11T12:00:00",
+        //            "matchedNumbers": 6,
+        //            "status": "WIN",
+        //            "message": "🎉 Congratulations! You matched 6 numbers and won!"
+        //          }
+
     }
 }
