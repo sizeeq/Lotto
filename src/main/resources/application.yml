@@ -2,3 +2,19 @@ spring:
   data:
     mongodb:
       uri: mongodb://admin:admin@localhost:27017/lotto-web
+
+lotto:
+  winning-numbers-generator:
+    config:
+      lowerBound: 1
+      upperBound: 99
+      requiredNumbers: 6
+  http:
+    client:
+      config:
+        uri: http://ec2-3-127-218-34.eu-central-1.compute.amazonaws.com
+        port: 9090
+        connectionTimeout: 5000
+        readTimeout: 5000
+        writeTimeout: 5000
+        random-number-service-path: /api/v1.0/random

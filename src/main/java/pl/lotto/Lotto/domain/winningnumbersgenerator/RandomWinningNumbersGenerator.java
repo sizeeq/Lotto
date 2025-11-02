@@ -7,11 +7,16 @@ import java.util.Set;
 
 public class RandomWinningNumbersGenerator implements WinningNumbersGenerator {
 
-    private static final int LOWER_BOUND = 1;
-    private static final int UPPER_BOUND = 99;
-    private static final int REQUIRED_NUMBERS = 6;
-
     private final Random random = new SecureRandom();
+    private WinningNumbersProperties properties;
+
+    private final int LOWER_BOUND = properties.getLowerBound();
+    private final int UPPER_BOUND = properties.getUpperBound();
+    private final int REQUIRED_NUMBERS = properties.getRequiredNumbers();
+
+    public RandomWinningNumbersGenerator(WinningNumbersProperties properties) {
+        this.properties = properties;
+    }
 
     @Override
     public Set<Integer> generate() {
