@@ -1,12 +1,24 @@
 package pl.lotto.feature;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import pl.lotto.BaseIntegrationTest;
+import pl.lotto.Lotto.domain.winningnumbersgenerator.WinningNumbersGenerator;
+
+import java.util.Set;
 
 public class UserPlayedAndWonIntegrationTest extends BaseIntegrationTest {
 
+    @Autowired
+    WinningNumbersGenerator winningNumbersGenerator;
+
     @Test
     public void f() {
+
+        Set<Integer> generate = winningNumbersGenerator.generate();
+
+        System.out.println(generate);
+
         // step 1: External service (ExternalWinningNumbersGenerator) returned winning numbers: (1, 2, 3, 4, 5, 6)
         //          for the upcoming draw date: 11.10.2025 12:00 (Saturday).
 
