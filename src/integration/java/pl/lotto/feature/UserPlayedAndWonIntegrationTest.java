@@ -1,11 +1,11 @@
 package pl.lotto.feature;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import pl.lotto.BaseIntegrationTest;
 import pl.lotto.Lotto.domain.winningnumbersgenerator.WinningNumbersGenerator;
-
-import java.util.Set;
 
 public class UserPlayedAndWonIntegrationTest extends BaseIntegrationTest {
 
@@ -14,25 +14,36 @@ public class UserPlayedAndWonIntegrationTest extends BaseIntegrationTest {
 
     @Test
     public void f() {
-
-        Set<Integer> generate = winningNumbersGenerator.generate();
-
-        System.out.println(generate);
-
         // step 1: External service (ExternalWinningNumbersGenerator) returned winning numbers: (1, 2, 3, 4, 5, 6)
         //          for the upcoming draw date: 11.10.2025 12:00 (Saturday).
+        //given
+        wireMockServer.stubFor(WireMock.get("/api/v1.0/random?min=1&max=99&count=6")
+                .willReturn(WireMock.aResponse()
+                        .withStatus(HttpStatus.OK.value())
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("""
+                                [1, 2, 3, 4, 5, 6]
+                                """.trim()
+                        )
+                )
+        );
 
-        // step 2: User sent POST /inputNumbers with numbers (1, 2, 3, 4, 5, 6) at time 08.10.2025 10:00.
+        //when
+        winningNumbersGenerator.generate();
+
+        //then
+
+        // step 2: On 11.10.2025 12:00 system fetched the winning numbers
+        //          for draw date 11.10.2025 12:00 from ExternalWinningNumbersGenerator
+        //          through NumberGeneratorFacade and saved them to WinningNumbersRepository.
+
+        // step 3: User sent POST /inputNumbers with numbers (1, 2, 3, 4, 5, 6) at time 08.10.2025 10:00.
         //          System responded with HTTP 200 OK and returned:
         //          {
         //            "message": "SUCCESS",
         //            "ticketId": "sampleTicketId",
         //            "drawDate": "2025-10-11T12:00:00"
         //          }
-
-        // step 3: On 11.10.2025 12:00 system fetched the winning numbers
-        //          for draw date 11.10.2025 12:00 from ExternalWinningNumbersGenerator
-        //          through NumberGeneratorFacade and saved them to WinningNumbersRepository.
 
         // step 4: Time advanced to 11.10.2025 12:01 (1 minute after draw time).
         //          System triggered ResultCheckerFacade to calculate results for all tickets with draw date 11.10.2025 12:00.

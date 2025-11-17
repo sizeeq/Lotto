@@ -94,6 +94,12 @@
             <artifactId>wiremock-jre8-standalone</artifactId>
             <version>3.0.1</version>
         </dependency>
+        <!--AWAITILITY-->
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <version>4.2.2</version>
+        </dependency>
     </dependencies>
 
     <build>

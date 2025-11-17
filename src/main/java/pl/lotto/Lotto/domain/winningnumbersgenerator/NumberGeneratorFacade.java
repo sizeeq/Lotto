@@ -1,5 +1,6 @@
 package pl.lotto.Lotto.domain.winningnumbersgenerator;
 
+import org.springframework.stereotype.Component;
 import pl.lotto.Lotto.domain.numberreceiver.NumberReceiverFacade;
 import pl.lotto.Lotto.domain.numberreceiver.NumberValidator;
 import pl.lotto.Lotto.domain.numberreceiver.ValidationError;
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
+@Component
 public class NumberGeneratorFacade {
 
     private final WinningNumbersGenerator winningNumbersGenerator;

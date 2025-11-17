@@ -1,9 +1,11 @@
 package pl.lotto.Lotto.domain.resultannouncer;
 
+import org.springframework.stereotype.Component;
 import pl.lotto.Lotto.domain.resultannouncer.dto.ResultAnnouncerDto;
 import pl.lotto.Lotto.domain.resultchecker.ResultCheckerFacade;
 import pl.lotto.Lotto.domain.resultchecker.dto.ResultDto;
 
+@Component
 public class ResultAnnouncerFacade {
 
     private final ResultCheckerFacade resultCheckerFacade;

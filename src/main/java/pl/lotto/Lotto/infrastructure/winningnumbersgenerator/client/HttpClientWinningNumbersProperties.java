@@ -17,4 +17,5 @@ public class HttpClientWinningNumbersProperties {
     private int readTimeout;
     private int writeTimeout;
     private String randomNumberServicePath;
+    private String generatorCron;
 }
