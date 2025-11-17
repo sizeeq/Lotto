@@ -18,3 +18,4 @@ lotto:
         readTimeout: 5000
         writeTimeout: 5000
         random-number-service-path: /api/v1.0/random
+        generator-cron: "0 0 12 * * 6"

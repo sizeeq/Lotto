@@ -1,9 +1,13 @@
 package pl.lotto.Lotto.domain.winningnumbersgenerator;
 
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
+
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-public interface WinningNumbersRepository {
+@Repository
+public interface WinningNumbersRepository extends MongoRepository<WinningNumbers, LocalDateTime> {
 
     WinningNumbers save(WinningNumbers winningNumbers);
 

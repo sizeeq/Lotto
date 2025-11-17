@@ -1,5 +1,6 @@
 package pl.lotto.Lotto.domain.resultchecker;
 
+import org.springframework.stereotype.Component;
 import pl.lotto.Lotto.domain.numberreceiver.NumberReceiverFacade;
 import pl.lotto.Lotto.domain.numberreceiver.Ticket;
 import pl.lotto.Lotto.domain.numberreceiver.TicketMapper;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
+@Component
 public class ResultCheckerFacade {
 
     private final NumberReceiverFacade numberReceiverFacade;

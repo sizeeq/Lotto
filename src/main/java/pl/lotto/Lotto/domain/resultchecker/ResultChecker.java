@@ -1,11 +1,13 @@
 package pl.lotto.Lotto.domain.resultchecker;
 
+import org.springframework.stereotype.Component;
 import pl.lotto.Lotto.domain.numberreceiver.Ticket;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Component
 public class ResultChecker {
 
     private final static int NUMBERS_REQUIRED_TO_WIN = 3;
