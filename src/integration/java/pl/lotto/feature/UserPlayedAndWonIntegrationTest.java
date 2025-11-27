@@ -5,12 +5,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import pl.lotto.BaseIntegrationTest;
-import pl.lotto.Lotto.domain.winningnumbersgenerator.WinningNumbersGenerator;
+import pl.lotto.Lotto.domain.winningnumbersgenerator.NumberGeneratorFacade;
+import pl.lotto.Lotto.domain.winningnumbersgenerator.WinningNumbersNotFoundException;
+import pl.lotto.Lotto.domain.winningnumbersgenerator.dto.WinningNumbersDto;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+
+import static org.awaitility.Awaitility.await;
 
 public class UserPlayedAndWonIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
-    WinningNumbersGenerator winningNumbersGenerator;
+    NumberGeneratorFacade numberGeneratorFacade;
 
     @Test
     public void f() {
@@ -28,14 +35,27 @@ public class UserPlayedAndWonIntegrationTest extends BaseIntegrationTest {
                 )
         );
 
-        //when
-        winningNumbersGenerator.generate();
-
-        //then
-
         // step 2: On 11.10.2025 12:00 system fetched the winning numbers
         //          for draw date 11.10.2025 12:00 from ExternalWinningNumbersGenerator
         //          through NumberGeneratorFacade and saved them to WinningNumbersRepository.
+
+        //given
+        LocalDateTime drawDate = LocalDateTime.of(2025, 10, 11, 12, 0);
+
+        //when
+        await().atMost(Duration.ofSeconds(20))
+                .until(() ->
+                        {
+                            try {
+                                WinningNumbersDto winningNumbersDto = numberGeneratorFacade.findWinningNumbersByDrawDate(drawDate);
+                                return winningNumbersDto.numbers().size() == 6;
+                            } catch (WinningNumbersNotFoundException e) {
+                                return false;
+                            }
+                        }
+                );
+
+        //then
 
         // step 3: User sent POST /inputNumbers with numbers (1, 2, 3, 4, 5, 6) at time 08.10.2025 10:00.
         //          System responded with HTTP 200 OK and returned:

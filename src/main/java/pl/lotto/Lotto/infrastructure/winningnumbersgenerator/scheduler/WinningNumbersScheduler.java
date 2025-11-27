@@ -16,13 +16,13 @@ public class WinningNumbersScheduler {
         this.numberGeneratorFacade = numberGeneratorFacade;
     }
 
-    @Scheduled(cron = "${lotto.http.client.config.generator-cron}")
+    @Scheduled(cron = "${lotto.winning-numbers-generator.config.generator-cron}")
     public WinningNumbersDto generateWinningNumbers() {
         log.info("WinningNumbersScheduler generating winning numbers");
 
         WinningNumbersDto winningNumbersDto = numberGeneratorFacade.generateWinningNumbers();
-        log.info("Generated winning numbers: " + winningNumbersDto.numbers());
-        log.info("Draw date: " + winningNumbersDto.drawDate());
+        log.info("Generated winning numbers: {}", winningNumbersDto.numbers());
+        log.info("Draw date: {}", winningNumbersDto.drawDate());
 
         return winningNumbersDto;
     }

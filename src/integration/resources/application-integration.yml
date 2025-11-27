@@ -1,0 +1,3 @@
+lotto:
+  winning-numbers-generator:
+    generator-cron: "*/1 * * * * *"
