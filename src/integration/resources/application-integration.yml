@@ -1,0 +1,4 @@
+lotto:
+  winning-numbers-generator:
+    config:
+      generator-cron: "*/5 * * * * *"

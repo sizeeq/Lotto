@@ -1,13 +1,17 @@
 package pl.lotto.Lotto.domain.winningnumbersgenerator;
 
 import lombok.Builder;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 import java.util.Set;
 
 @Builder
+@Document
 public record WinningNumbers(
-        Set<Integer> numbers,
-        LocalDateTime drawDate
+        @Id
+        LocalDateTime drawDate,
+        Set<Integer> numbers
 ) {
 }

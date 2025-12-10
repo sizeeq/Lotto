@@ -34,10 +34,13 @@ public class NumberGeneratorFacade {
             throw new IllegalArgumentException("Generated numbers are not valid");
         }
 
-        return WinningNumbersDto.builder()
-                .numbers(generatedWinningNumbers)
+        WinningNumbers winningNumbers = WinningNumbers.builder()
                 .drawDate(nextDrawDate)
+                .numbers(generatedWinningNumbers)
                 .build();
+
+        WinningNumbers save = repository.save(winningNumbers);
+        return WinningNumbersMapper.toDto(save);
     }
 
     public WinningNumbersDto findWinningNumbersByDrawDate(LocalDateTime drawDate) {

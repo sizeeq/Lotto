@@ -8,8 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface WinningNumbersRepository extends MongoRepository<WinningNumbers, LocalDateTime> {
-
-    WinningNumbers save(WinningNumbers winningNumbers);
-
+    
     Optional<WinningNumbers> findByDrawDate(LocalDateTime drawDate);
 }

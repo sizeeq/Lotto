@@ -1,4 +1,6 @@
 spring:
+  main:
+    allow-bean-definition-overriding: true
   data:
     mongodb:
       uri: mongodb://admin:admin@localhost:27017/lotto-web
@@ -9,6 +11,7 @@ lotto:
       lowerBound: 1
       upperBound: 99
       requiredNumbers: 6
+      generator-cron: "0 0 12 * * 6"
   http:
     client:
       config:
@@ -18,4 +21,3 @@ lotto:
         readTimeout: 5000
         writeTimeout: 5000
         random-number-service-path: /api/v1.0/random
-        generator-cron: "0 0 12 * * 6"
