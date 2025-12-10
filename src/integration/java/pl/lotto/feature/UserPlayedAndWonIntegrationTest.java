@@ -35,14 +35,14 @@ public class UserPlayedAndWonIntegrationTest extends BaseIntegrationTest {
                 )
         );
 
-        // step 2: On 11.10.2025 12:00 system fetched the winning numbers
+        // step 2: On 10.10.2025 10:00 system fetched the winning numbers
         //          for draw date 11.10.2025 12:00 from ExternalWinningNumbersGenerator
         //          through NumberGeneratorFacade and saved them to WinningNumbersRepository.
 
         //given
         LocalDateTime drawDate = LocalDateTime.of(2025, 10, 11, 12, 0);
 
-        //when
+        //when && then
         await().atMost(Duration.ofSeconds(20))
                 .until(() ->
                         {

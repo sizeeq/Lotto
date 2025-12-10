@@ -21,6 +21,7 @@ public class WinningNumbersScheduler {
         log.info("WinningNumbersScheduler generating winning numbers");
 
         WinningNumbersDto winningNumbersDto = numberGeneratorFacade.generateWinningNumbers();
+        
         log.info("Generated winning numbers: {}", winningNumbersDto.numbers());
         log.info("Draw date: {}", winningNumbersDto.drawDate());
 
