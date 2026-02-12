@@ -9,7 +9,7 @@ import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
 
 @Component
-public class SaturdayDrawDateProvider implements DrawDateProvider {
+class SaturdayDrawDateProvider implements DrawDateProvider {
 
     private static final LocalTime DRAW_TIME = LocalTime.of(12, 0, 0);
     private final Clock clock;

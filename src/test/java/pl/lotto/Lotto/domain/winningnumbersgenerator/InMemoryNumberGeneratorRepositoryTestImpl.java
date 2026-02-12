@@ -18,8 +18,9 @@ public class InMemoryNumberGeneratorRepositoryTestImpl implements WinningNumbers
     Map<LocalDateTime, WinningNumbers> inMemoryDatabase = new ConcurrentHashMap<>();
 
     @Override
-    public WinningNumbers save(WinningNumbers winningNumbers) {
-        return inMemoryDatabase.put(winningNumbers.drawDate(), winningNumbers);
+    public <S extends WinningNumbers> S save(S entity) {
+        inMemoryDatabase.put(entity.drawDate(), entity);
+        return entity;
     }
 
     @Override
@@ -71,6 +72,7 @@ public class InMemoryNumberGeneratorRepositoryTestImpl implements WinningNumbers
     public <S extends WinningNumbers, R> R findBy(Example<S> example, Function<FluentQuery.FetchableFluentQuery<S>, R> queryFunction) {
         return null;
     }
+
 
     @Override
     public <S extends WinningNumbers> List<S> saveAll(Iterable<S> entities) {

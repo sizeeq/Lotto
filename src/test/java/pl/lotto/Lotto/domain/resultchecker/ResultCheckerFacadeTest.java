@@ -10,8 +10,10 @@ import pl.lotto.Lotto.domain.numberreceiver.NumberReceiverFacade;
 import pl.lotto.Lotto.domain.numberreceiver.Ticket;
 import pl.lotto.Lotto.domain.numberreceiver.TicketMapper;
 import pl.lotto.Lotto.domain.resultchecker.dto.ResultDto;
-import pl.lotto.Lotto.domain.winningnumbersgenerator.NumberGeneratorFacade;
+import pl.lotto.Lotto.domain.resultchecker.exception.ResultNotFoundException;
+import pl.lotto.Lotto.domain.resultchecker.exception.WinningNumbersNotFoundException;
 import pl.lotto.Lotto.domain.winningnumbersgenerator.WinningNumbers;
+import pl.lotto.Lotto.domain.winningnumbersgenerator.WinningNumbersGeneratorFacade;
 import pl.lotto.Lotto.domain.winningnumbersgenerator.WinningNumbersMapper;
 
 import java.time.LocalDateTime;
@@ -31,7 +33,7 @@ class ResultCheckerFacadeTest {
     @Mock
     private NumberReceiverFacade numberReceiverFacade;
     @Mock
-    private NumberGeneratorFacade numberGeneratorFacade;
+    private WinningNumbersGeneratorFacade winningNumbersGeneratorFacade;
     @Mock
     private ResultCheckerRepository repository;
     @Mock
@@ -39,7 +41,7 @@ class ResultCheckerFacadeTest {
 
     @BeforeEach
     public void setUp() {
-        resultCheckerFacade = new ResultCheckerFacade(numberReceiverFacade, numberGeneratorFacade, resultChecker, repository);
+        resultCheckerFacade = new ResultCheckerFacade(numberReceiverFacade, winningNumbersGeneratorFacade, resultChecker, repository);
     }
 
     @Test
@@ -66,7 +68,7 @@ class ResultCheckerFacadeTest {
 
         when(numberReceiverFacade.getNextDrawDate()).thenReturn(drawDate);
         when(numberReceiverFacade.getTicketsByDrawDate(drawDate)).thenReturn(TicketMapper.toDto(tickets));
-        when(numberGeneratorFacade.findWinningNumbersByDrawDate(drawDate)).thenReturn(WinningNumbersMapper.toDto(winningNumbers));
+        when(winningNumbersGeneratorFacade.findWinningNumbersByDrawDate(drawDate)).thenReturn(WinningNumbersMapper.toDto(winningNumbers));
 
         //when
         List<ResultDto> results = resultCheckerFacade.calculateWinners();
@@ -94,7 +96,7 @@ class ResultCheckerFacadeTest {
         assertThat(results).containsExactlyInAnyOrder(expectedWinningResult, expectedLosingResult);
         verify(numberReceiverFacade).getNextDrawDate();
         verify(numberReceiverFacade).getTicketsByDrawDate(drawDate);
-        verify(numberGeneratorFacade).findWinningNumbersByDrawDate(drawDate);
+        verify(winningNumbersGeneratorFacade).findWinningNumbersByDrawDate(drawDate);
     }
 
     @Test
@@ -121,7 +123,7 @@ class ResultCheckerFacadeTest {
 
         when(numberReceiverFacade.getNextDrawDate()).thenReturn(drawDate);
         when(numberReceiverFacade.getTicketsByDrawDate(drawDate)).thenReturn(TicketMapper.toDto(tickets));
-        when(numberGeneratorFacade.findWinningNumbersByDrawDate(drawDate)).thenReturn(WinningNumbersMapper.toDto(winningNumbers));
+        when(winningNumbersGeneratorFacade.findWinningNumbersByDrawDate(drawDate)).thenReturn(WinningNumbersMapper.toDto(winningNumbers));
 
         //when
         List<ResultDto> resultDtos = resultCheckerFacade.calculateWinners();
@@ -136,7 +138,7 @@ class ResultCheckerFacadeTest {
                 );
         verify(numberReceiverFacade).getNextDrawDate();
         verify(numberReceiverFacade).getTicketsByDrawDate(drawDate);
-        verify(numberGeneratorFacade).findWinningNumbersByDrawDate(drawDate);
+        verify(winningNumbersGeneratorFacade).findWinningNumbersByDrawDate(drawDate);
     }
 
     @Test
@@ -152,7 +154,7 @@ class ResultCheckerFacadeTest {
 
         when(numberReceiverFacade.getNextDrawDate()).thenReturn(drawDate);
         when(numberReceiverFacade.getTicketsByDrawDate(drawDate)).thenReturn(TicketMapper.toDto(tickets));
-        when(numberGeneratorFacade.findWinningNumbersByDrawDate(drawDate)).thenReturn(WinningNumbersMapper.toDto(winningNumbers));
+        when(winningNumbersGeneratorFacade.findWinningNumbersByDrawDate(drawDate)).thenReturn(WinningNumbersMapper.toDto(winningNumbers));
 
         //when
         List<ResultDto> resultDtos = resultCheckerFacade.calculateWinners();
@@ -161,7 +163,7 @@ class ResultCheckerFacadeTest {
         assertThat(resultDtos).isEmpty();
         verify(numberReceiverFacade).getNextDrawDate();
         verify(numberReceiverFacade).getTicketsByDrawDate(drawDate);
-        verify(numberGeneratorFacade).findWinningNumbersByDrawDate(drawDate);
+        verify(winningNumbersGeneratorFacade).findWinningNumbersByDrawDate(drawDate);
     }
 
     @Test
@@ -188,7 +190,7 @@ class ResultCheckerFacadeTest {
 
         when(numberReceiverFacade.getNextDrawDate()).thenReturn(drawDate);
         when(numberReceiverFacade.getTicketsByDrawDate(drawDate)).thenReturn(TicketMapper.toDto(tickets));
-        when(numberGeneratorFacade.findWinningNumbersByDrawDate(drawDate)).thenReturn(WinningNumbersMapper.toDto(winningNumbers));
+        when(winningNumbersGeneratorFacade.findWinningNumbersByDrawDate(drawDate)).thenReturn(WinningNumbersMapper.toDto(winningNumbers));
 
         //when
         //then
@@ -197,7 +199,7 @@ class ResultCheckerFacadeTest {
                 .hasMessage("Winning numbers are not available yet");
         verify(numberReceiverFacade).getNextDrawDate();
         verify(numberReceiverFacade).getTicketsByDrawDate(drawDate);
-        verify(numberGeneratorFacade).findWinningNumbersByDrawDate(drawDate);
+        verify(winningNumbersGeneratorFacade).findWinningNumbersByDrawDate(drawDate);
     }
 
     @Test

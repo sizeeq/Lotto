@@ -1,4 +1,4 @@
-package pl.lotto.Lotto.domain.winningnumbersgenerator;
+package pl.lotto.Lotto.domain.winningnumbersgenerator.exception;
 
 public class WinningNumbersNotFoundException extends RuntimeException {
 

@@ -3,12 +3,12 @@ package pl.lotto.Lotto.domain.resultchecker;
 import org.springframework.stereotype.Component;
 import pl.lotto.Lotto.domain.numberreceiver.Ticket;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
-public class ResultChecker {
+class ResultChecker {
 
     private final static int NUMBERS_REQUIRED_TO_WIN = 3;
 
@@ -35,9 +35,9 @@ public class ResultChecker {
     }
 
     private Set<Integer> findMatchedNumbers(Set<Integer> numbersFromUser, Set<Integer> winningNumbers) {
-        return numbersFromUser.stream()
-                .filter(winningNumbers::contains)
-                .collect(Collectors.toSet());
+        Set<Integer> matched = new HashSet<>(numbersFromUser);
+        matched.retainAll(winningNumbers);
+        return matched;
     }
 
     private ResultStatus generateResultStatus(Set<Integer> matchedNumbers) {

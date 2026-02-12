@@ -4,7 +4,7 @@ import pl.lotto.Lotto.domain.resultchecker.dto.ResultDto;
 
 import java.util.List;
 
-public class ResultMapper {
+class ResultMapper {
 
     public static Result toEntity(ResultDto resultDto) {
         return Result.builder()

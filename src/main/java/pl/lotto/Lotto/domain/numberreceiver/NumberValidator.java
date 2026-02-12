@@ -17,6 +17,7 @@ public class NumberValidator {
         List<ValidationError> validationErrors = new ArrayList<>();
 
         int size = numbersFromUser.size();
+
         if (size > REQUIRED_NUMBERS_FROM_USER) {
             validationErrors.add(ValidationError.TOO_MANY_NUMBERS);
         } else if (numbersFromUser.size() < REQUIRED_NUMBERS_FROM_USER) {
