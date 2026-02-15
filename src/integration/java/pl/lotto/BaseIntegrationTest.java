@@ -43,5 +43,4 @@ public class BaseIntegrationTest {
         registry.add("lotto.http.client.config.uri", () -> WIRE_MOCK_HOST);
         registry.add("lotto.http.client.config.port", () -> wireMockServer.getPort());
     }
-
 }

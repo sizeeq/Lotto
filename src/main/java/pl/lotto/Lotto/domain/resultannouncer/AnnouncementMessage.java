@@ -2,7 +2,7 @@ package pl.lotto.Lotto.domain.resultannouncer;
 
 enum AnnouncementMessage {
 
-    ID_DOES_NOT_EXIST("Given id does not exist"),
+    ID_DOES_NOT_EXIST("Result not found for given id"),
     RESULT_BEING_CALCULATED("Results are being calculated, please come back later"),
     WIN("Congratulations, you've won!"),
     LOSE("You didn't win this time. Try again!"),

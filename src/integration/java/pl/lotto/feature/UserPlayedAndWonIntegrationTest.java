@@ -113,12 +113,14 @@ public class UserPlayedAndWonIntegrationTest extends BaseIntegrationTest {
 
         //when
         ResultActions performGetResults = mockMvc.perform(get(path));
-        
+
         //then
         performGetResults.andExpect(status().isNotFound())
                 .andExpect(content().json("""
-                        "message": "Result not found for id: notExistingId",
-                        "status": "NOT_FOUND"
+                        {
+                        "message": "Result for id: notExistingId was not found",
+                        "httpStatus": "NOT_FOUND"
+                        }
                         """.trim()
                 ));
 
