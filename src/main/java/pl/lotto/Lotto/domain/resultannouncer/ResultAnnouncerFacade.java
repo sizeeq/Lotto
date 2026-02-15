@@ -1,44 +1,58 @@
 package pl.lotto.Lotto.domain.resultannouncer;
 
 import org.springframework.stereotype.Component;
-import pl.lotto.Lotto.domain.resultannouncer.dto.ResultAnnouncerDto;
+import pl.lotto.Lotto.domain.resultannouncer.dto.ResultAnnouncerResponseDto;
 import pl.lotto.Lotto.domain.resultchecker.ResultCheckerFacade;
 import pl.lotto.Lotto.domain.resultchecker.dto.ResultDto;
+
+import java.time.Clock;
+import java.time.LocalDateTime;
+
+import static pl.lotto.Lotto.domain.resultannouncer.AnnouncementMessage.*;
 
 @Component
 public class ResultAnnouncerFacade {
 
     private final ResultCheckerFacade resultCheckerFacade;
     private final ResultAnnouncerRepository repository;
+    private final Clock clock;
 
-    public ResultAnnouncerFacade(ResultCheckerFacade resultCheckerFacade, ResultAnnouncerRepository repository) {
+    public ResultAnnouncerFacade(ResultCheckerFacade resultCheckerFacade, ResultAnnouncerRepository repository, Clock clock) {
         this.resultCheckerFacade = resultCheckerFacade;
         this.repository = repository;
+        this.clock = clock;
     }
 
-    public ResultAnnouncerDto announceResult(String ticketId) {
+    public ResultAnnouncerResponseDto checkResult(String ticketId) {
         return repository.findById(ticketId)
-                .map(ResultAnnouncerMapper::toDto)
-                .orElseGet(() -> {
-                    ResultDto resultByTicketId = resultCheckerFacade.findResultByTicketId(ticketId);
-                    String resultMessage = buildMessage(resultByTicketId);
-
-                    ResultAnnouncer announcer = buildResultAnnouncer(resultByTicketId, resultMessage);
-                    repository.save(announcer);
-
-                    return ResultAnnouncerMapper.toDto(announcer);
-                });
+                .map(result -> new ResultAnnouncerResponseDto(ResultAnnouncerMapper.toDto(result), RESULT_ALREADY_CHECKED.message))
+                .orElseGet(() -> handleNewResult(ticketId));
     }
 
-    private ResultAnnouncer buildResultAnnouncer(ResultDto resultByTicketId, String resultMessage) {
-        return ResultAnnouncer.builder()
-                .ticketId(resultByTicketId.ticketId())
-                .userNumbers(resultByTicketId.userNumbers())
-                .winningNumbers(resultByTicketId.winningNumbers())
-                .drawDate(resultByTicketId.drawDate())
-                .status(resultByTicketId.status())
-                .message(resultMessage)
-                .build();
+    private ResultAnnouncerResponseDto handleNewResult(String ticketId) {
+        ResultDto resultDto = resultCheckerFacade.findResultByTicketId(ticketId);
+
+        if (resultDto == null) {
+            return new ResultAnnouncerResponseDto(null, ID_DOES_NOT_EXIST.message);
+        }
+
+        if (!isAfterAnnouncementTime(resultDto)) {
+            return new ResultAnnouncerResponseDto(ResultAnnouncerMapper.toDto(resultDto), RESULT_BEING_CALCULATED.message);
+        }
+
+        String message = buildMessage(resultDto);
+        ResultAnnouncerEntity resultAnnouncerEntity = ResultAnnouncerMapper.toEntity(resultDto);
+        repository.save(resultAnnouncerEntity);
+
+        return new ResultAnnouncerResponseDto(ResultAnnouncerMapper.toDto(resultAnnouncerEntity), message);
+    }
+
+    private boolean isAfterAnnouncementTime(ResultDto resultDto) {
+        if (resultDto.drawDate() == null) {
+            throw new IllegalStateException("Draw date cannot be null");
+        }
+        LocalDateTime now = LocalDateTime.now(clock);
+        return now.isAfter(resultDto.drawDate());
     }
 
     private String buildMessage(ResultDto resultDto) {

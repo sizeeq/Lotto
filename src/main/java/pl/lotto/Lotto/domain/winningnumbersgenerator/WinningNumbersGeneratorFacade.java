@@ -5,20 +5,21 @@ import pl.lotto.Lotto.domain.numberreceiver.NumberReceiverFacade;
 import pl.lotto.Lotto.domain.numberreceiver.NumberValidator;
 import pl.lotto.Lotto.domain.numberreceiver.ValidationError;
 import pl.lotto.Lotto.domain.winningnumbersgenerator.dto.WinningNumbersDto;
+import pl.lotto.Lotto.domain.winningnumbersgenerator.exception.WinningNumbersNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
 @Component
-public class NumberGeneratorFacade {
+public class WinningNumbersGeneratorFacade {
 
     private final WinningNumbersGenerator winningNumbersGenerator;
     private final WinningNumbersRepository repository;
     private final NumberValidator numberValidator;
     private final NumberReceiverFacade numberReceiverFacade;
 
-    public NumberGeneratorFacade(WinningNumbersGenerator winningNumbersGenerator, WinningNumbersRepository repository, NumberValidator numberValidator, NumberReceiverFacade numberReceiverFacade) {
+    public WinningNumbersGeneratorFacade(WinningNumbersGenerator winningNumbersGenerator, WinningNumbersRepository repository, NumberValidator numberValidator, NumberReceiverFacade numberReceiverFacade) {
         this.winningNumbersGenerator = winningNumbersGenerator;
         this.repository = repository;
         this.numberValidator = numberValidator;

@@ -10,26 +10,24 @@ import pl.lotto.Lotto.domain.numberreceiver.NumberReceiverFacade;
 import pl.lotto.Lotto.domain.numberreceiver.NumberValidator;
 import pl.lotto.Lotto.domain.numberreceiver.ValidationError;
 import pl.lotto.Lotto.domain.winningnumbersgenerator.dto.WinningNumbersDto;
+import pl.lotto.Lotto.domain.winningnumbersgenerator.exception.WinningNumbersNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class NumberGeneratorFacadeTest {
+class WinningNumbersGeneratorFacadeTest {
 
     @Mock
     private final NumberValidator numberValidator = new NumberValidator();
-    @Mock
-    private WinningNumbersRepository repository;
-    private NumberGeneratorFacade numberGeneratorFacade;
+    private final WinningNumbersRepository repository = new InMemoryNumberGeneratorRepositoryTestImpl();
+    private WinningNumbersGeneratorFacade winningNumbersGeneratorFacade;
     @Mock
     private WinningNumbersGenerator winningNumbersGenerator;
 
@@ -38,7 +36,7 @@ class NumberGeneratorFacadeTest {
 
     @BeforeEach
     void setUp() {
-        numberGeneratorFacade = new NumberGeneratorFacade(winningNumbersGenerator, repository, numberValidator, numberReceiverFacade);
+        winningNumbersGeneratorFacade = new WinningNumbersGeneratorFacade(winningNumbersGenerator, repository, numberValidator, numberReceiverFacade);
     }
 
     @Test
@@ -52,7 +50,7 @@ class NumberGeneratorFacadeTest {
         when(winningNumbersGenerator.generate()).thenReturn(generatedWinningNumbers);
 
         //when
-        WinningNumbersDto result = numberGeneratorFacade.generateWinningNumbers();
+        WinningNumbersDto result = winningNumbersGeneratorFacade.generateWinningNumbers();
 
         //then
         assertThat(result.numbers()).isEqualTo(generatedWinningNumbers);
@@ -72,7 +70,7 @@ class NumberGeneratorFacadeTest {
 
         //when
         //then
-        assertThatThrownBy(() -> numberGeneratorFacade.generateWinningNumbers())
+        assertThatThrownBy(() -> winningNumbersGeneratorFacade.generateWinningNumbers())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Generated numbers are not valid");
     }
@@ -89,7 +87,7 @@ class NumberGeneratorFacadeTest {
         when(numberValidator.validate(generatedWinningNumbers)).thenReturn(Collections.emptyList());
 
         //when
-        WinningNumbersDto result = numberGeneratorFacade.generateWinningNumbers();
+        WinningNumbersDto result = winningNumbersGeneratorFacade.generateWinningNumbers();
 
         //then
         assertThat(result.numbers()).isEqualTo(generatedWinningNumbers);
@@ -108,13 +106,12 @@ class NumberGeneratorFacadeTest {
                 .drawDate(expectedDrawDate)
                 .build();
 
-        when(repository.findByDrawDate(expectedDrawDate)).thenReturn(Optional.of(expectedEntity));
+        repository.save(expectedEntity);
 
         //when
-        WinningNumbersDto result = numberGeneratorFacade.findWinningNumbersByDrawDate(expectedDrawDate);
+        WinningNumbersDto result = winningNumbersGeneratorFacade.findWinningNumbersByDrawDate(expectedDrawDate);
 
         //then
-        verify(repository).findByDrawDate(expectedDrawDate);
         assertThat(result.numbers()).isEqualTo(expectedEntity.numbers());
         assertThat(result.drawDate()).isEqualTo(expectedEntity.drawDate());
     }
@@ -125,13 +122,10 @@ class NumberGeneratorFacadeTest {
         //given
         LocalDateTime expectedDrawDate = LocalDateTime.of(2025, 10, 4, 12, 0, 0); // 4 (sobota) październik 2025, godzina 12:00
 
-        when(repository.findByDrawDate(expectedDrawDate)).thenReturn(Optional.empty());
-
         //when
         //then
-        assertThatThrownBy(() -> numberGeneratorFacade.findWinningNumbersByDrawDate(expectedDrawDate))
+        assertThatThrownBy(() -> winningNumbersGeneratorFacade.findWinningNumbersByDrawDate(expectedDrawDate))
                 .isInstanceOf(WinningNumbersNotFoundException.class)
                 .hasMessage("Winning numbers were not found");
-        verify(repository).findByDrawDate(expectedDrawDate);
     }
 }

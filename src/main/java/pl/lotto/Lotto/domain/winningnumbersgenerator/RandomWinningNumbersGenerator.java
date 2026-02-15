@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-public class RandomWinningNumbersGenerator implements WinningNumbersGenerator {
+class RandomWinningNumbersGenerator implements WinningNumbersGenerator {
 
     private final Random random = new SecureRandom();
     private WinningNumbersProperties properties;
