@@ -18,7 +18,7 @@ public class WinningNumbersScheduler {
 
     @Scheduled(cron = "${lotto.winning-numbers-generator.config.generator-cron}")
     public WinningNumbersDto generateWinningNumbers() {
-        log.info("WinningNumbersScheduler generating winning numbers");
+        log.info("WinningNumbersScheduler generating winning numbers...");
 
         WinningNumbersDto winningNumbersDto = winningNumbersGeneratorFacade.generateWinningNumbers();
 

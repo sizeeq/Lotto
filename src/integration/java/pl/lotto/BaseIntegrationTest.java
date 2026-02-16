@@ -14,6 +14,7 @@ import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+import pl.lotto.Lotto.AdjustableClock;
 import pl.lotto.Lotto.LottoApplication;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
@@ -36,6 +37,8 @@ public class BaseIntegrationTest {
     public ObjectMapper objectMapper;
     @Autowired
     public MockMvc mockMvc;
+    @Autowired
+    public AdjustableClock clock;
 
     @DynamicPropertySource
     public static void propertyOverride(DynamicPropertyRegistry registry) {
