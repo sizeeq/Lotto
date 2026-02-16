@@ -6,12 +6,16 @@ spring:
       uri: mongodb://admin:admin@localhost:27017/lotto-web
 
 lotto:
+  result-checker:
+    config:
+      scheduler-cron: "0 55 11 * * 6"
   winning-numbers-generator:
     config:
       lowerBound: 1
       upperBound: 99
       requiredNumbers: 6
       generator-cron: "0 0 12 * * 6"
+
   http:
     client:
       config:

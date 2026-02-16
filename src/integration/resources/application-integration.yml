@@ -1,4 +1,7 @@
 lotto:
+  result-checker:
+    config:
+      scheduler-cron: "*/7 * * * * *"
   winning-numbers-generator:
     config:
       generator-cron: "*/5 * * * * *"
