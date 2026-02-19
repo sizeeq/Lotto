@@ -2,58 +2,53 @@ package pl.lotto.apivalidationerror;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
 import pl.lotto.BaseIntegrationTest;
-import pl.lotto.Lotto.infrastructure.apivalidation.ApiValidationErrorDto;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class ApiValidationFailedIntegrationTest extends BaseIntegrationTest {
 
     @Test
     public void should_return_bad_request_and_validation_messages_when_client_sends_empty_request_input_data() throws Exception {
         //given
-        //when
-        ResultActions perform = mockMvc.perform(post("/inputNumbers")
-                .content(
-                        """
-                                {
-                                 "inputNumbers": []
-                                }
-                                """.trim()
-                ).contentType(MediaType.APPLICATION_JSON)
-        );
+        String postInputNumbersPath = "/inputNumbers";
 
-        //then
-        MvcResult mvcResult = perform.andExpect(status().isBadRequest()).andReturn();
-        String json = mvcResult.getResponse().getContentAsString();
-        ApiValidationErrorDto apiValidationErrorDto = objectMapper.readValue(json, ApiValidationErrorDto.class);
-        assertThat(apiValidationErrorDto.errorMessages().contains("inputNumbers must not be empty"));
+        //when
+        mockMvc.perform(post(postInputNumbersPath)
+                        .content(
+                                """
+                                        {
+                                         "inputNumbers": []
+                                        }
+                                        """.trim()
+                        ).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.errorMessages").value(contains("inputNumbers must not be empty")));
     }
 
     @Test
     public void should_return_bad_request_and_validation_messages_when_client_sends_no_request_input_data() throws Exception {
         //given
-        //when
-        ResultActions perform = mockMvc.perform(post("/inputNumbers")
-                .content(
-                        """
-                                {
-                                }
-                                """.trim()
-                ).contentType(MediaType.APPLICATION_JSON)
-        );
+        String postInputNumbersPath = "/inputNumbers";
 
-        //then
-        MvcResult mvcResult = perform.andExpect(status().isBadRequest()).andReturn();
-        String json = mvcResult.getResponse().getContentAsString();
-        ApiValidationErrorDto apiValidationErrorDto = objectMapper.readValue(json, ApiValidationErrorDto.class);
-        assertThat(apiValidationErrorDto.errorMessages().containsAll(List.of("inputNumbers must not be null", "inputNumbers must not be empty")));
+        //when && then
+        mockMvc.perform(post(postInputNumbersPath)
+                        .content(
+                                """
+                                        {
+                                        }
+                                        """.trim()
+                        ).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.errorMessages").value(containsInAnyOrder(
+                        "inputNumbers must not be null",
+                        "inputNumbers must not be empty"
+                )));
     }
 
 }

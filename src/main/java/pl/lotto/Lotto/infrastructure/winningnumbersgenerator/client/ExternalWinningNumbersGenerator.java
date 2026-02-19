@@ -1,14 +1,14 @@
 package pl.lotto.Lotto.infrastructure.winningnumbersgenerator.client;
 
 import lombok.extern.log4j.Log4j2;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.server.ResponseStatusException;
 import pl.lotto.Lotto.domain.winningnumbersgenerator.WinningNumbersGenerator;
 import pl.lotto.Lotto.domain.winningnumbersgenerator.WinningNumbersProperties;
-import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,12 +17,12 @@ import java.util.Set;
 @Log4j2
 public class ExternalWinningNumbersGenerator implements WinningNumbersGenerator {
 
-    private final WebClient webClient;
+    private final RestClient restClient;
     private final WinningNumbersProperties properties;
     private final HttpClientWinningNumbersProperties httpProperties;
 
-    public ExternalWinningNumbersGenerator(WebClient webClient, WinningNumbersProperties properties, HttpClientWinningNumbersProperties httpProperties) {
-        this.webClient = webClient;
+    public ExternalWinningNumbersGenerator(RestClient restClient, WinningNumbersProperties properties, HttpClientWinningNumbersProperties httpProperties) {
+        this.restClient = restClient;
         this.properties = properties;
         this.httpProperties = httpProperties;
     }
@@ -34,27 +34,20 @@ public class ExternalWinningNumbersGenerator implements WinningNumbersGenerator 
         try {
             List<Integer> numbers = makeGetRequest();
             return parseNumbersFromList(numbers);
-        } catch (WebClientResponseException e) {
-            log.error("External service responded with error: {} {}", e.getStatusCode(), e.getMessage());
-        } catch (Exception e) {
-            log.error("Failed to fetch numbers due to: {}", e.getMessage());
+        } catch (ResponseStatusException exception) {
+            log.error("Error during winning numbers fetch: {} {}", exception.getStatusCode(), exception.getReason());
+            throw exception;
+        } catch (RestClientResponseException exception) {
+            log.error("External service responded with error: {} {}", exception.getStatusCode(), exception.getMessage());
+            throw new ResponseStatusException(exception.getStatusCode(), exception.getMessage());
+        } catch (Exception exception) {
+            log.error("Unexpected error: {}", exception.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
         }
-
-        return Collections.emptySet();
-    }
-
-    private Set<Integer> parseNumbersFromList(List<Integer> numbers) {
-        if (numbers == null || numbers.size() != properties.getRequiredNumbers()) {
-            log.error("Invalid number set fetched: {}", numbers);
-            return Collections.emptySet();
-        }
-
-        log.info("Successfully fetched numbers: {}", numbers);
-        return Set.copyOf(numbers);
     }
 
     private List<Integer> makeGetRequest() {
-        return webClient.get()
+        return restClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(httpProperties.getRandomNumberServicePath())
                         .queryParam("min", properties.getLowerBound())
@@ -62,16 +55,23 @@ public class ExternalWinningNumbersGenerator implements WinningNumbersGenerator 
                         .queryParam("count", properties.getRequiredNumbers())
                         .build())
                 .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, response ->
-                        Mono.error(new ResponseStatusException(
-                                response.statusCode(),
-                                "Client error while fetching winning numbers: " + response.statusCode())))
-                .onStatus(HttpStatusCode::is5xxServerError, response ->
-                        Mono.error(new ResponseStatusException(
-                                HttpStatus.INTERNAL_SERVER_ERROR,
-                                "Server error while fetching winning numbers")))
-                .bodyToFlux(Integer.class)
-                .collectList()
-                .block();
+                .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
+                    throw new ResponseStatusException(response.getStatusCode(), "Client error while fetching winning numbers");
+                }))
+                .onStatus(HttpStatusCode::is5xxServerError, ((request, response) -> {
+                    throw new ResponseStatusException(response.getStatusCode(), "Server error while fetching winning numbers");
+                }))
+                .body(new ParameterizedTypeReference<>() {
+                });
+    }
+
+    private Set<Integer> parseNumbersFromList(List<Integer> numbers) {
+        if (numbers == null || numbers.size() != properties.getRequiredNumbers()) {
+            log.error("Invalid number set fetched: {}", numbers);
+            throw new ResponseStatusException(HttpStatus.NO_CONTENT);
+        }
+
+        log.info("Successfully fetched winning numbers: {}", numbers);
+        return Set.copyOf(numbers);
     }
 }
