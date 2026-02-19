@@ -23,5 +23,4 @@ lotto:
         port: 9090
         connectionTimeout: 5000
         readTimeout: 5000
-        writeTimeout: 5000
         random-number-service-path: /api/v1.0/random

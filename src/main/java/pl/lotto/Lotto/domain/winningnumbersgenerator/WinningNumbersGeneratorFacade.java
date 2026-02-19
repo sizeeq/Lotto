@@ -52,5 +52,9 @@ public class WinningNumbersGeneratorFacade {
         return WinningNumbersMapper.toDto(winningNumbersByDrawDate);
     }
 
+    public boolean areWinningNumbersGeneratedForUpcomingDrawDate() {
+        LocalDateTime nextDrawDate = numberReceiverFacade.getNextDrawDate();
+        return repository.existsByDrawDate(nextDrawDate);
+    }
 
 }

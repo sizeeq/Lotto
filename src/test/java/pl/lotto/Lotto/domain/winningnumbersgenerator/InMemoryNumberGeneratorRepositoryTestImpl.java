@@ -29,6 +29,11 @@ public class InMemoryNumberGeneratorRepositoryTestImpl implements WinningNumbers
     }
 
     @Override
+    public boolean existsByDrawDate(LocalDateTime drawDate) {
+        return inMemoryDatabase.containsKey(drawDate);
+    }
+
+    @Override
     public <S extends WinningNumbers> S insert(S entity) {
         return null;
     }

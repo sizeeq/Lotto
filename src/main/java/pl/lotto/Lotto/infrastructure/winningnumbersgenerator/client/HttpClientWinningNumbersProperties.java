@@ -15,6 +15,5 @@ public class HttpClientWinningNumbersProperties {
     private String port;
     private int connectionTimeout;
     private int readTimeout;
-    private int writeTimeout;
     private String randomNumberServicePath;
 }

@@ -7,8 +7,8 @@ import java.util.List;
 
 public record InputNumberRequestDto(
 
-        @NotNull(message = "{inputNumber.not.null}")
-        @NotEmpty(message = "{inputNumber.not.empty}")
+        @NotNull(message = "{inputNumbers.not.null}")
+        @NotEmpty(message = "{inputNumbers.not.empty}")
         List<Integer> inputNumbers
 ) {
 }
