@@ -24,3 +24,9 @@ lotto:
         connectionTimeout: 5000
         readTimeout: 5000
         random-number-service-path: /api/v1.0/random
+
+  jwt:
+    config:
+      secret: ${JWT_SECRET}
+      issuer: Lotto Service
+      expirationDays: 30

@@ -104,7 +104,7 @@ public class ExternalWinningNumbersGeneratorErrorIntegrationTest {
     }
 
     @Test
-    void should_throw_no_content_exception_when_status_not_content() {
+    void should_throw_no_content_exception_when_status_no_content() {
         //given
         wireMockServer.stubFor(WireMock.get("/api/v1.0/random?min=1&max=99&count=25")
                 .willReturn(WireMock.aResponse()
