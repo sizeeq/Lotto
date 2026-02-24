@@ -10,7 +10,6 @@ import org.springframework.web.server.ResponseStatusException;
 import pl.lotto.Lotto.domain.winningnumbersgenerator.WinningNumbersGenerator;
 import pl.lotto.Lotto.domain.winningnumbersgenerator.WinningNumbersProperties;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
