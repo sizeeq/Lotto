@@ -1,10 +1,10 @@
 package pl.lotto.http.winningnumbergenerator;
 
 import org.springframework.web.client.RestClient;
-import pl.lotto.Lotto.domain.winningnumbersgenerator.WinningNumbersGenerator;
-import pl.lotto.Lotto.domain.winningnumbersgenerator.WinningNumbersProperties;
-import pl.lotto.Lotto.infrastructure.winningnumbersgenerator.client.HttpClientWinningNumbersProperties;
-import pl.lotto.Lotto.infrastructure.winningnumbersgenerator.client.WinningNumbersGeneratorClientConfig;
+import pl.lotto.domain.winningnumbersgenerator.WinningNumbersGenerator;
+import pl.lotto.domain.winningnumbersgenerator.WinningNumbersProperties;
+import pl.lotto.infrastructure.winningnumbersgenerator.client.HttpClientWinningNumbersProperties;
+import pl.lotto.infrastructure.winningnumbersgenerator.client.WinningNumbersGeneratorClientConfig;
 
 public class WinningNumberGeneratorIntegrationTestConfig extends WinningNumbersGeneratorClientConfig {
 

@@ -8,19 +8,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import pl.lotto.BaseIntegrationTest;
-import pl.lotto.Lotto.domain.numberreceiver.dto.NumberReceiverResultDto;
-import pl.lotto.Lotto.domain.resultchecker.ResultCheckerFacade;
-import pl.lotto.Lotto.domain.resultchecker.dto.ResultDto;
-import pl.lotto.Lotto.domain.resultchecker.exception.ResultNotFoundException;
-import pl.lotto.Lotto.domain.winningnumbersgenerator.WinningNumbersGeneratorFacade;
-import pl.lotto.Lotto.domain.winningnumbersgenerator.dto.WinningNumbersDto;
-import pl.lotto.Lotto.domain.winningnumbersgenerator.exception.WinningNumbersNotFoundException;
+import pl.lotto.domain.numberreceiver.dto.NumberReceiverResultDto;
+import pl.lotto.domain.resultchecker.ResultCheckerFacade;
+import pl.lotto.domain.resultchecker.dto.ResultDto;
+import pl.lotto.domain.resultchecker.exception.ResultNotFoundException;
+import pl.lotto.domain.winningnumbersgenerator.WinningNumbersGeneratorFacade;
+import pl.lotto.domain.winningnumbersgenerator.dto.WinningNumbersDto;
+import pl.lotto.domain.winningnumbersgenerator.exception.WinningNumbersNotFoundException;
+import pl.lotto.infrastructure.security.dto.JwtResponseDto;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.hasLength;
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -39,7 +41,87 @@ public class UserPlayedAndWonIntegrationTest extends BaseIntegrationTest {
         //Starting date is: 10.10.2025 10:00 -> 10th October Friday 2025 10:00
         //Next draw date is: 11.10.2025 12:00 -> 11th October Saturday 2025 12:00
 
-        // step 1: External service (ExternalWinningNumbersGenerator) returned winning numbers: (1, 2, 3, 4, 5, 6)
+        // step 1: User attempts to obtain a token via POST /token (username=someUser, password=somePassword)
+        // System returns 401 UNAUTHORIZED
+
+        //given
+        String postTokenPath = "/token";
+        String postTokenContent = """
+                {
+                "username": "someUsername",
+                "password": "somePassword"
+                }
+                """.trim();
+
+        //when && then
+        mockMvc.perform(post(postTokenPath)
+                        .content(postTokenContent)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value("Bad Credentials"))
+                .andExpect(jsonPath("$.httpStatus").value("UNAUTHORIZED"));
+
+
+        // step 2: User calls POST /inputNumbers without a token
+        // System returns 403 FORBIDDEN
+
+        //given
+        String postInputNumbers = "/inputNumbers";
+
+        //when && then
+        mockMvc.perform(post(postInputNumbers)
+                        .content(
+                                """
+                                        {
+                                                 "inputNumbers": [1,2,3,4,5,6]
+                                        }
+                                        """.trim())
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                .andExpect(status().isForbidden());
+
+
+        // step 3: User registers via POST /register (username=someUsername, password=somePassword)
+        // System creates the user (role: USER) and returns 201 CREATED
+
+        //given
+        String postRegisterPath = "/register";
+        String postRegisterContent = """
+                {
+                "username": "someUsername",
+                "password": "somePassword"
+                }
+                """.trim();
+
+        //when && then
+        mockMvc.perform(post(postRegisterPath)
+                        .content(postRegisterContent)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").isNotEmpty())
+                .andExpect(jsonPath("$.username").value("someUsername"))
+                .andExpect(jsonPath("$.isCreated").value(true));
+
+
+        // step 4: User logs in via POST /token and receives token JWT=AAAA.BBBB.CCC
+        // System returns 200 OK
+
+        //given && when && then
+        MvcResult postTokenResult = mockMvc.perform(post(postTokenPath)
+                        .content(postTokenContent)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value("someUsername"))
+                .andExpect(jsonPath("$.token", matchesPattern("^[A-Za-z0-9-_=]+\\.[A-Za-z0-9-_=]+\\.[A-Za-z0-9-_=]+$")))
+                .andReturn();
+
+        String contentAsString = postTokenResult.getResponse().getContentAsString();
+        JwtResponseDto jwtResponseDto = objectMapper.readValue(contentAsString, JwtResponseDto.class);
+        String jwtToken = jwtResponseDto.token();
+
+        // step 5: External service (ExternalWinningNumbersGenerator) returned winning numbers: (1, 2, 3, 4, 5, 6)
         //          for the upcoming draw date: 11.10.2025 12:00 (Saturday).
 
         //given && when && then
@@ -55,7 +137,7 @@ public class UserPlayedAndWonIntegrationTest extends BaseIntegrationTest {
         );
 
 
-        // step 2: On 10.10.2025 10:00 system fetched the winning numbers
+        // step 6: On 10.10.2025 10:00 system fetched the winning numbers
         //          for draw date 11.10.2025 12:00 from ExternalWinningNumbersGenerator
         //          through NumberGeneratorFacade and saved them to WinningNumbersRepository.
 
@@ -76,7 +158,7 @@ public class UserPlayedAndWonIntegrationTest extends BaseIntegrationTest {
                 );
 
 
-        // step 3: User sent POST /inputNumbers with numbers (1, 2, 3, 4, 5, 6) at time 10.10.2025 10:00.
+        // step 7: User sent POST /inputNumbers with numbers (1, 2, 3, 4, 5, 6) at time 10.10.2025 10:00 with JWTToken.
         //          System responded with HTTP 200 OK and returned:
         //          {
         //            "success" : true,
@@ -98,8 +180,9 @@ public class UserPlayedAndWonIntegrationTest extends BaseIntegrationTest {
                                         {
                                                  "inputNumbers": [1,2,3,4,5,6]
                                         }
-                                        """
-                        ).contentType(MediaType.APPLICATION_JSON)
+                                        """.trim())
+                        .header("Authorization", "Bearer " + jwtToken)
+                        .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -114,7 +197,7 @@ public class UserPlayedAndWonIntegrationTest extends BaseIntegrationTest {
         String id = responseDto.ticket().id();
 
 
-        // step 4: User sent GET /results/notExistingId.
+        // step 8: User sent GET /results/notExistingId.
         //          System returned HTTP 404 NOT_FOUND with payload:
         //          {
         //            "message": "Result for id: notExistingId was not found",
@@ -125,21 +208,22 @@ public class UserPlayedAndWonIntegrationTest extends BaseIntegrationTest {
         String path = "/results/notExistingId";
 
         //when && then
-        mockMvc.perform(get(path))
+        mockMvc.perform(get(path)
+                        .header("Authorization", "Bearer " + jwtToken))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value("Result for id: notExistingId was not found"))
                 .andExpect(jsonPath("$.httpStatus").value("NOT_FOUND"));
 
 
-        // step 5: Time advanced to 11.10.2025 11:55 (5 minutes before draw time).
+        // step 9: Time advanced to 11.10.2025 11:55 (5 minutes before draw time).
 
         //given && when && then
         // Advancing clock to 11.10.2025 11:55 (5 minutes before draw time)
         clock.plusDaysAndMinutes(1, 115);
 
 
-        // step 6: ResultCheckerFacade calculated results for tickets and for ticket: ticketId = "generatedId*"
+        // step 10: ResultCheckerFacade calculated results for tickets and for ticket: ticketId = "generatedId*"
         //          with matchedNumbers = 6, status = WIN.
 
         //given && when && then
@@ -157,7 +241,7 @@ public class UserPlayedAndWonIntegrationTest extends BaseIntegrationTest {
                 );
 
 
-        // step 7: Time advanced to 11.10.2025 12:01 (1 minute after official announcement time).
+        // step 11: Time advanced to 11.10.2025 12:01 (1 minute after official announcement time).
         //          ResultAnnouncerFacade was triggered and prepared/cached announcement messages
         //          for all available results in ResultAnnouncerRepository.
 
@@ -166,7 +250,7 @@ public class UserPlayedAndWonIntegrationTest extends BaseIntegrationTest {
         clock.plusDaysAndMinutes(0, 6);
 
 
-        // step 8: User sent GET /results/generatedTickedId*.
+        // step 12: User sent GET /results/generatedTickedId*.
         //          System returned HTTP 200 OK with payload:
         //          {
         //            "ticketId": "generatedTickedId*",
@@ -180,7 +264,8 @@ public class UserPlayedAndWonIntegrationTest extends BaseIntegrationTest {
         String getResultPath = "/results/" + id;
 
         //when && then
-        mockMvc.perform(get(getResultPath))
+        mockMvc.perform(get(getResultPath)
+                        .header("Authorization", "Bearer " + jwtToken))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value("Congratulations, you've won and hit 6 numbers!"))

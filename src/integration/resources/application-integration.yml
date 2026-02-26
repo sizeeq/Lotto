@@ -5,3 +5,8 @@ lotto:
   winning-numbers-generator:
     config:
       generator-cron: "*/5 * * * * *"
+  jwt:
+    config:
+      secret: test-secret
+      issuer: Lotto Service
+      expirationDays: 365
