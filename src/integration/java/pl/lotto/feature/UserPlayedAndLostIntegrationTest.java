@@ -4,8 +4,8 @@ import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.lotto.BaseIntegrationTest;
-import pl.lotto.Lotto.domain.resultchecker.ResultCheckerFacade;
-import pl.lotto.Lotto.domain.winningnumbersgenerator.WinningNumbersGeneratorFacade;
+import pl.lotto.domain.resultchecker.ResultCheckerFacade;
+import pl.lotto.domain.winningnumbersgenerator.WinningNumbersGeneratorFacade;
 
 @Log4j2
 public class UserPlayedAndLostIntegrationTest extends BaseIntegrationTest {
