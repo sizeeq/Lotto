@@ -4,6 +4,13 @@ spring:
   data:
     mongodb:
       uri: mongodb://admin:admin@localhost:27017/lotto-web
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:63792}
+  cache:
+    type: redis
+    redis:
+      time-to-live: PT60M
 
 lotto:
   result-checker:
@@ -19,8 +26,8 @@ lotto:
   http:
     client:
       config:
-        uri: http://ec2-3-127-218-34.eu-central-1.compute.amazonaws.com
-        port: 9090
+        uri: http://www.randomnumberapi.com
+        port: 80
         connectionTimeout: 5000
         readTimeout: 5000
         random-number-service-path: /api/v1.0/random
