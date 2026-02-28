@@ -3,6 +3,7 @@ package pl.lotto.domain.resultannouncer.dto;
 import lombok.Builder;
 import pl.lotto.domain.resultchecker.ResultStatus;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -13,5 +14,6 @@ public record ResultDetailsDto(
         Set<Integer> winningNumbers,
         int matchedNumbers,
         LocalDateTime drawDate,
-        ResultStatus status) {
+        ResultStatus status)
+implements Serializable {
 }

@@ -1,5 +1,6 @@
 package pl.lotto.domain.resultannouncer;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import pl.lotto.domain.resultannouncer.dto.ResultAnnouncerResponseDto;
 import pl.lotto.domain.resultchecker.ResultCheckerFacade;
@@ -23,6 +24,7 @@ public class ResultAnnouncerFacade {
         this.clock = clock;
     }
 
+    @Cacheable(cacheNames = "lotto")
     public ResultAnnouncerResponseDto checkResult(String ticketId) {
         return repository.findById(ticketId)
                 .map(result -> new ResultAnnouncerResponseDto(ResultAnnouncerMapper.toDto(result), RESULT_ALREADY_CHECKED.message))
